@@ -1,0 +1,78 @@
+# The only config in this repo. Every VBD number downstream depends on it.
+# CONFIRM `teams` and `draft_slot` before Evening 4 — a wrong team count
+# silently corrupts the entire board.
+
+[league]
+name       = "Fantasy Winner"
+yahoo_id   = 890969
+teams      = 12          # <-- CONFIRM
+draft_slot = 1           # <-- CONFIRM (1 = first overall)
+draft_type = "snake"
+
+[roster]
+# No kicker. Excluded from VBD baselines entirely.
+starters = { QB = 1, RB = 2, WR = 2, TE = 1, FLEX = 1, DEF = 1 }
+flex_eligible = ["RB", "WR", "TE"]
+bench = 5
+ir = 1
+
+[scoring.passing]
+yards = 0.04
+td = 4.0
+interception = -1.0
+two_pt = 2.0
+
+[scoring.rushing]
+yards = 0.1
+td = 6.0
+two_pt = 2.0
+bonus_40yd_td = 2.0      # +2 for a 40+ yard rushing TD
+
+[scoring.receiving]
+reception = 1.0          # full PPR
+yards = 0.1
+td = 6.0
+two_pt = 2.0
+bonus_40yd_td = 2.0      # +2 for a 40+ yard receiving TD
+
+[scoring.misc]
+fumble_lost = -2.0
+
+[scoring.dst]
+sack = 1.0
+interception = 2.0
+fumble_recovery = 2.0
+td = 6.0
+safety = 2.0
+block_kick = 2.0
+return_td = 6.0
+
+# More generous than Yahoo default at the top end — raises elite DST value.
+[[scoring.dst.points_allowed]]
+max = 0
+points = 10.0
+[[scoring.dst.points_allowed]]
+max = 6
+points = 7.0
+[[scoring.dst.points_allowed]]
+max = 13
+points = 4.0
+[[scoring.dst.points_allowed]]
+max = 20
+points = 1.0
+[[scoring.dst.points_allowed]]
+max = 27
+points = 0.0
+[[scoring.dst.points_allowed]]
+max = 34
+points = -1.0
+[[scoring.dst.points_allowed]]
+max = 9999
+points = -4.0
+
+[board]
+adp_source   = "fantasyfootballcalculator"   # free, personal use, attribution required
+adp_format   = "ppr"
+season       = 2026
+history_seasons = [2023, 2024, 2025]         # for the ADP -> points fit
+tier_gap_sd  = 0.75                          # gap threshold in SDs of the VBD diff
