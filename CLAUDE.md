@@ -16,8 +16,24 @@ The T-30 routine, in order:
 2. `fw-sheet --slot N` — regenerates the printable page. Offline, sub-second.
 3. `fw-track --slot N` — tracker comes up knowing which picks are yours.
 
-As insurance, pre-render all `teams` slot variants of the sheet the night
-before, so on the night you are opening a file rather than running a command.
+As insurance, pre-render all 12 slot variants of the sheet the night before, so
+on the night you are opening a file rather than running a command.
+
+Confirmed: **12 teams, plain snake, no third-round reversal** — so pick math is
+uniform every round, and 8 starters + 5 bench = **13 rounds, 156 picks**. Slot 1
+waits 22 picks between turns; slot 6 never waits more than 12.
+
+## We see the full draft order, not just our slot
+
+Under plain snake, pick number → team is arithmetic, so every pick you mark is
+attributed to a team for free — no extra typing on the clock. The tracker
+accumulates all 12 rosters and uses them to sharpen the cliff warning from
+*"this tier will probably empty"* to *"4 teams pick before you, 3 have no RB,
+and this tier has 2 left."*
+
+Opponent **needs** are computed from their roster so far. Opponent *tendencies*
+are not modelled — we have no history on these managers, and inventing a
+behavioural model from nothing would be worse than the positional-need read.
 
 ## The one rule
 

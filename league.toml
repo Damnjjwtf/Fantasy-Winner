@@ -1,6 +1,5 @@
 # The only config in this repo. Every VBD number downstream depends on it.
-# CONFIRM `teams` before Evening 4 — a wrong team count silently corrupts
-# the entire board.
+# All values below are CONFIRMED against league settings (2026-08-27).
 #
 # There is deliberately NO draft_slot here. We only learn the order 30 minutes
 # before the draft, so slot is a RUNTIME argument (`fw-track --slot N`), never
@@ -9,9 +8,9 @@
 [league]
 name       = "Fantasy Winner"
 yahoo_id   = 890969
-teams      = 12          # <-- CONFIRM
+teams      = 12
 draft_type = "snake"
-third_round_reversal = false   # <-- CONFIRM; changes pick math if true
+third_round_reversal = false   # plain snake: pick math is uniform every round
 
 [roster]
 # No kicker. Excluded from VBD baselines entirely.
