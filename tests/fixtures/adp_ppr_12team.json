@@ -1,0 +1,25 @@
+{
+  "status": "Success",
+  "meta": {
+    "type": "ppr",
+    "teams": 12,
+    "rounds": 15,
+    "total_drafts": 412,
+    "start_date": "2026-08-01",
+    "end_date": "2026-08-26"
+  },
+  "players": [
+    {"player_id": 2551, "name": "Ja'Marr Chase", "position": "WR", "team": "CIN",
+     "adp": 1.4, "adp_formatted": "1.01", "times_drafted": 400, "high": 1, "low": 3, "stdev": 0.6, "bye": 10},
+    {"player_id": 3021, "name": "Bijan Robinson", "position": "RB", "team": "ATL",
+     "adp": 2.6, "adp_formatted": "1.03", "times_drafted": 398, "high": 1, "low": 6, "stdev": 1.1, "bye": 5},
+    {"player_id": 4017, "name": "Saquon Barkley", "position": "RB", "team": "PHI",
+     "adp": 3.9, "adp_formatted": "1.04", "times_drafted": 395, "high": 1, "low": 9, "stdev": 1.4, "bye": 9},
+    {"player_id": 5120, "name": "Lamar Jackson", "position": "QB", "team": "BAL",
+     "adp": 22.7, "adp_formatted": "2.11", "times_drafted": 380, "high": 12, "low": 40, "stdev": 5.2, "bye": 7},
+    {"player_id": 6233, "name": "Brock Bowers", "position": "TE", "team": "LV",
+     "adp": 18.3, "adp_formatted": "2.06", "times_drafted": 371, "high": 9, "low": 31, "stdev": 4.4, "bye": 8},
+    {"player_id": 7781, "name": "Baltimore", "position": "DEF", "team": "BAL",
+     "adp": 128.5, "adp_formatted": "11.09", "times_drafted": 210, "high": 96, "low": 156, "stdev": 12.0, "bye": 7}
+  ]
+}

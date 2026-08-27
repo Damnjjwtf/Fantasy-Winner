@@ -91,7 +91,7 @@ network-dependent step (the ADP refresh) happens that day, so keep the previous
 |---|---|
 | `league.toml` | **The only config.** Scoring, roster, team count. No draft slot — see above. |
 | `src/fw/scoring.py` | Stat line → fantasy points under our rules. Pure, no I/O. |
-| `src/fw/sources.py` | FFC ADP + Sleeper metadata + nflreadpy history → `data/raw/`. |
+| `src/fw/sources.py` | FFC ADP + nflreadpy history/metadata → `data/raw/`. Only networked module. |
 | `src/fw/board.py` | ADP + history → projected points → VBD → tiers → `data/board.csv`. |
 | `src/fw/track.py` | Draft-night REPL. Stdlib only. |
 | `src/fw/sheet.py` | `board.csv` + `--slot` → one-page printable HTML. Last line of defence. |
@@ -142,15 +142,25 @@ wrong.
 
 - **ADP** — [Fantasy Football Calculator ADP REST API](https://help.fantasyfootballcalculator.com/article/42-adp-rest-api).
   Free for personal use; **attribution required**; do not call frequently.
-- **Player metadata** — Sleeper public read-only API, no auth. Stay under 1000 req/min.
-- **Historical stats** — `nflreadpy` (returns Polars). `nfl_data_py` was archived
-  Sep 2025 — do not use it. ID joins via `nflreadpy.load_ff_playerids()`.
+- **Historical stats + player metadata** — `nflreadpy` (returns Polars).
+  `nfl_data_py` was archived Sep 2025 — do not use it.
+- **Sleeper is NOT used.** It was in the original plan for player metadata, but
+  `load_players()` already carries name/position/team/status and nflreadpy is a
+  dependency anyway. Dropping it removed a network call, a rate limit and an
+  attribution obligation for nothing lost. With FFC the only HTTP endpoint left,
+  stdlib `urllib` covers it — no `httpx`.
+- **The 40+ yard counts are free.** nflverse ships `rushing_40` / `receiving_40`
+  as counts of 40+ yard plays — exactly what our any-play bonus pays on. No
+  play-by-play derivation needed. Pick sixes DO need pbp (`interception` and
+  `return_touchdown`), since player_stats carries only total interceptions.
 
 ## Environment note
 
-Claude Code web containers cannot reach these hosts (egress proxy returns 403 on
-`fantasyfootballcalculator.com` and `api.sleeper.app`). Write and unit-test
-ingest against `tests/fixtures/`; run real pulls locally.
+nflverse data **is** reachable from Claude Code web containers, so history and
+player metadata can be pulled and validated here. `fantasyfootballcalculator.com`
+is **not** (egress proxy returns 403), so the ADP fetch must be run locally. The
+ADP path is unit-tested against `tests/fixtures/adp_ppr_12team.json` and needs
+no network.
 
 ## Out of scope before Sep 3
 
