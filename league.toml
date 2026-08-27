@@ -1,56 +1,80 @@
 # The only config in this repo. Every VBD number downstream depends on it.
-# All values below are CONFIRMED against league settings (2026-08-27).
+#
+# Transcribed verbatim from Yahoo League Settings screenshots (league 890969),
+# captured 2026-08-27. Where this file and the architecture doc disagree, THIS
+# FILE WINS — the doc had several values wrong.
 #
 # There is deliberately NO draft_slot here. We only learn the order 30 minutes
 # before the draft, so slot is a RUNTIME argument (`fw-track --slot N`), never
 # build-time config. The board does not depend on it.
 
 [league]
-name       = "Fantasy Winner"
-yahoo_id   = 890969
-teams      = 12
-draft_type = "snake"
-third_round_reversal = false   # plain snake: pick math is uniform every round
+name        = "Down Goes Just Win Baby!"
+yahoo_id    = 890969
+teams       = 12
+draft_type  = "snake"              # Yahoo "Live Standard Draft"
+third_round_reversal = false
+draft_time  = "2026-09-03T23:00:00-04:00"   # Thu Sep 3, 11:00pm EDT
+pick_clock_seconds = 60
+scoring_type = "head_to_head"
+fractional_points = true
+negative_points = true
 
 [roster]
-# No kicker. Excluded from VBD baselines entirely.
+# Yahoo: QB, WR, WR, RB, RB, TE, W/R/T, DEF, BN x5, IR
+# NO KICKER — confirmed. No K position, no K baseline in VBD.
 starters = { QB = 1, RB = 2, WR = 2, TE = 1, FLEX = 1, DEF = 1 }
-flex_eligible = ["RB", "WR", "TE"]
+flex_eligible = ["WR", "RB", "TE"]   # Yahoo "W/R/T"
 bench = 5
 ir = 1
+# => 8 starters + 5 bench = 13 rounds, 156 total picks
 
 [scoring.passing]
-yards = 0.04
-td = 4.0
-interception = -1.0
-two_pt = 2.0
+yards        = 0.04    # 25 yards per point
+td           = 4.0
+interception = -2.0
+pick_six     = -4.0    # "Pick Sixes Thrown" — STACKS with the -2 INT (-6 total)
+two_pt       = 2.0
 
 [scoring.rushing]
-yards = 0.1
-td = 6.0
+yards  = 0.1           # 10 yards per point
+td     = 6.0
 two_pt = 2.0
-bonus_40yd_td = 2.0      # +2 for a 40+ yard rushing TD
 
 [scoring.receiving]
-reception = 1.0          # full PPR
-yards = 0.1
-td = 6.0
-two_pt = 2.0
-bonus_40yd_td = 2.0      # +2 for a 40+ yard receiving TD
+reception = 1.0        # full PPR
+yards     = 0.1        # 10 yards per point
+td        = 6.0
+two_pt    = 2.0
+
+[scoring.bonus]
+# Yahoo labels these "40+ Yard Run" and "40+ Yard Receptions" — note NEITHER
+# says "TD". Yahoo has separate stats for the TD-only variants, so these are
+# read as a bonus on ANY 40+ yard run or reception, scoring or not.
+# See the note in CLAUDE.md — this is the single highest-leverage open question
+# in the whole model.
+rush_40plus = 2.0
+recv_40plus = 2.0
+applies_to_td_only = false     # <-- VERIFY (see CLAUDE.md)
 
 [scoring.misc]
-fumble_lost = -2.0
+fumble_lost           = -2.0
+return_td             = 6.0   # offensive player kick/punt return TD
+offensive_fumble_return_td = 6.0
 
 [scoring.dst]
-sack = 1.0
-interception = 2.0
-fumble_recovery = 2.0
-td = 6.0
-safety = 2.0
-block_kick = 2.0
-return_td = 6.0
+sack             = 1.0
+interception     = 2.0
+fumble_recovery  = 2.0
+td               = 6.0
+safety           = 2.0
+block_kick       = 2.0
+return_td        = 6.0   # "Kickoff and Punt Return Touchdowns"
+extra_point_returned = 2.0
+# No yards-allowed tiers in this league — points allowed only.
 
-# More generous than Yahoo default at the top end — raises elite DST value.
+# More generous than Yahoo default at the top end (0 PA = 10, 1-6 = 7, 7-13 = 4)
+# which raises elite DST value.
 [[scoring.dst.points_allowed]]
 max = 0
 points = 10.0
@@ -62,20 +86,33 @@ max = 13
 points = 4.0
 [[scoring.dst.points_allowed]]
 max = 20
-points = 1.0
+points = 2.0
 [[scoring.dst.points_allowed]]
 max = 27
 points = 0.0
 [[scoring.dst.points_allowed]]
 max = 34
-points = -1.0
+points = -2.0
 [[scoring.dst.points_allowed]]
 max = 9999
 points = -4.0
 
+[waivers]
+# Track B concern — not before Sep 3.
+type            = "continual_rolling_list"
+waiver_time     = "none"
+weekly_process  = "game_time_tuesday"
+max_acquisitions_per_week   = 0    # 0 = unlimited
+max_acquisitions_per_season = 0    # 0 = unlimited
+
+[season]
+playoff_teams  = 6
+playoff_weeks  = [15, 16, 17]
+trade_end_date = "2026-11-28"
+
 [board]
-adp_source   = "fantasyfootballcalculator"   # free, personal use, attribution required
-adp_format   = "ppr"
-season       = 2026
-history_seasons = [2023, 2024, 2025]         # for the ADP -> points fit
-tier_gap_sd  = 0.75                          # gap threshold in SDs of the VBD diff
+adp_source      = "fantasyfootballcalculator"   # free, personal use, attribution required
+adp_format      = "ppr"
+season          = 2026
+history_seasons = [2023, 2024, 2025]
+tier_gap_sd     = 0.75

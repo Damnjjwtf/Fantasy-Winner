@@ -1,7 +1,9 @@
 # Fantasy Winner
 
 A pre-computed VBD value board plus an offline draft-night tier tracker.
-Draft: **Wed Sep 3, 11:00pm EDT**, 60-second pick clock.
+League **"Down Goes Just Win Baby!"** (Yahoo 890969), 12 teams, head-to-head.
+Draft: **Thu Sep 3 2026, 11:00pm EDT**, 60-second pick clock, live standard
+(snake). Note the architecture doc says "Wed" — Sep 3 2026 is a **Thursday**.
 
 ## Draft order arrives 30 minutes before the draft
 
@@ -66,13 +68,34 @@ Per evening: `/spec` → build → `/review` → `/qa` → `/ship`.
 
 ## League specifics that break generic tools
 
-- **No kicker.** No K position, no K baseline in VBD.
-- **Full PPR** (1.0/reception) plus **+2 for 40+ yard rushing and receiving TDs** —
-  this favours high-target and big-play players over generic-PPR consensus.
-- **DST tiers are more generous than Yahoo default** at the top (0 points allowed
-  = 10), which raises elite DST value.
-- **No FAAB**, rolling waiver priority, unlimited acquisitions, weekly processing
-  at Tuesday game time. (Track B concern — not before Sep 3.)
+`league.toml` is transcribed verbatim from the Yahoo settings screens. Where it
+and the architecture doc disagree, the config wins — the doc had several values
+wrong.
+
+- **No kicker.** Roster is QB/WR/WR/RB/RB/TE/W-R-T/DEF + 5 BN + 1 IR. No K
+  position, no K baseline in VBD. 13 rounds, 156 picks.
+- **Full PPR** (1.0/reception), 10 yards per point rushing and receiving.
+- **The 40+ yard bonus is the biggest single edge — and the biggest open
+  question.** Yahoo labels these "40+ Yard Run" and "40+ Yard Receptions".
+  Neither says *TD*, and Yahoo carries separate stats for the TD-only variants,
+  so we read them as **+2 on any 40+ yard run or reception, scoring or not**.
+  That is a much broader tilt toward explosive players than a TD-only bonus:
+  a 44-yard catch that ends at the 5 still pays. `applies_to_td_only = false`
+  encodes this. **Verify before Evening 4** — if it is TD-only, every WR/RB
+  ranking shifts. This is worth ten minutes with a scored box score.
+- **Turnovers are punitive for QBs.** INT is -2 (not the doc's -1), and
+  "Pick Sixes Thrown" -4 **stacks on top**, so a pick-six is -6. Combined with
+  only 4 pts per passing TD, this depresses high-volume gunslinger QBs.
+- **Easily-missed offensive categories:** Return TD 6, Offensive Fumble Return
+  TD 6. Small, but free points the generic models drop.
+- **DST is more generous than Yahoo default** at the top (0 PA = 10, 1-6 = 7,
+  7-13 = 4) *and* less punitive in the middle (14-20 = 2, 28-34 = -2, both
+  better than the doc claimed). Plus **Extra Point Returned 2**. No
+  yards-allowed tiers. Net: elite DST is worth more here than consensus says.
+- **No FAAB**, continual rolling waiver priority, no waiver time, unlimited
+  acquisitions, weekly processing at Tuesday game time. (Track B — not before
+  Sep 3.)
+- Playoffs: 6 teams, weeks 15-17. Trade deadline Nov 28 2026.
 
 ## Data sources (free only)
 
