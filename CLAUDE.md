@@ -105,14 +105,25 @@ wrong.
 - **No kicker.** Roster is QB/WR/WR/RB/RB/TE/W-R-T/DEF + 5 BN + 1 IR. No K
   position, no K baseline in VBD. 13 rounds, 156 picks.
 - **Full PPR** (1.0/reception), 10 yards per point rushing and receiving.
-- **The 40+ yard bonus is the biggest single edge — and the biggest open
-  question.** Yahoo labels these "40+ Yard Run" and "40+ Yard Receptions".
-  Neither says *TD*, and Yahoo carries separate stats for the TD-only variants,
-  so we read them as **+2 on any 40+ yard run or reception, scoring or not**.
-  That is a much broader tilt toward explosive players than a TD-only bonus:
-  a 44-yard catch that ends at the 5 still pays. `applies_to_td_only = false`
-  encodes this. **Verify before Sat Aug 29** (board build day) — if it is TD-only, every WR/RB
-  ranking shifts. This is worth ten minutes with a scored box score.
+- **The 40+ yard bonus is the biggest single edge.** Yahoo maintains BOTH
+  any-play and TD-only variants as separate scoring categories:
+
+  | any-play | TD-only |
+  |---|---|
+  | 40+ Yard Receptions *(Receiving 40 Yd Rec)* | 40+ Yard Reception Touchdowns *(Receiving 40 Yd TD)* |
+  | 40+ Yard Rushing Attempts *(Rushing 40 Yd Att)* | 40+ Yard Passing Touchdowns *(Passing 40 Yd TD)* |
+
+  Our settings screen reads "40+ Yard Receptions" and "40+ Yard Run" — the
+  any-play names, verbatim, with no "Touchdowns" qualifier. So the bonus pays
+  on **any 40+ yard run or reception, scoring or not**: a 44-yard catch that
+  dies at the 5 still pays +2. `applies_to_td_only = false`.
+
+  Worth ~12 points a season on a deep threat vs. a possession receiver who is
+  otherwise identical — about a round of draft capital. If you ever want to
+  double-check it, open a 2025 box score for a player with a long non-scoring
+  catch and see whether the bonus is in his total; flipping the flag re-scores
+  everything with no code change, and `test_same_line_under_td_only_reading`
+  pins the delta.
 - **Turnovers are punitive for QBs.** INT is -2 (not the doc's -1), and
   "Pick Sixes Thrown" -4 **stacks on top**, so a pick-six is -6. Combined with
   only 4 pts per passing TD, this depresses high-volume gunslinger QBs.
