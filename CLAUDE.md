@@ -64,6 +64,27 @@ one line → only then minimum working code).
 
 Per evening: `/spec` → build → `/review` → `/qa` → `/ship`.
 
+## Schedule
+
+All times EDT. "Evening N" from the architecture doc is not used here — real
+dates only, because the draft is at 11pm and off-by-one days matter.
+
+| Date | Day | Work |
+|---|---|---|
+| Aug 26 | Wed | ✅ scaffold, `league.toml` from real Yahoo settings. Install ponytail + gstack. |
+| Aug 27 | Thu | `scoring.py` + golden tests. Verify the 40-yd bonus question. |
+| Aug 28 | Fri | `sources.py` + committed fixtures. Runs on the local machine, not in a web container. |
+| Aug 29 | Sat | `board.py` — ADP→points fit, VBD, tiers. Review hard. |
+| Aug 30 | Sun | `track.py` — the draft-night REPL. |
+| Aug 31 | Mon | `track.py` polish: team attribution, needs-aware cliff warnings. |
+| Sep 1  | Tue | `sheet.py`, pre-render all 12 slot variants, clean-clone reproducibility run. |
+| Sep 2  | Wed | Yahoo mock draft at a real 60s clock. Target: decide in under 30s. |
+| Sep 3  | Thu | **Draft day.** Freeze code. Refresh ADP, regenerate board, print. T-30 routine at 10:30pm. **Draft 11:00pm.** |
+
+Sep 3 is a full working day — the draft is at 11pm, not 11am. But the last
+network-dependent step (the ADP refresh) happens that day, so keep the previous
+`board.csv` as a fallback and never overwrite a known-good board in place.
+
 ## Layout
 
 | Path | What it is |
@@ -90,7 +111,7 @@ wrong.
   so we read them as **+2 on any 40+ yard run or reception, scoring or not**.
   That is a much broader tilt toward explosive players than a TD-only bonus:
   a 44-yard catch that ends at the 5 still pays. `applies_to_td_only = false`
-  encodes this. **Verify before Evening 4** — if it is TD-only, every WR/RB
+  encodes this. **Verify before Sat Aug 29** (board build day) — if it is TD-only, every WR/RB
   ranking shifts. This is worth ten minutes with a scored box score.
 - **Turnovers are punitive for QBs.** INT is -2 (not the doc's -1), and
   "Pick Sixes Thrown" -4 **stacks on top**, so a pick-six is -6. Combined with
