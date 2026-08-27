@@ -3,6 +3,22 @@
 A pre-computed VBD value board plus an offline draft-night tier tracker.
 Draft: **Wed Sep 3, 11:00pm EDT**, 60-second pick clock.
 
+## Draft order arrives 30 minutes before the draft
+
+So **nothing built ahead of time may depend on the draft slot.** `league.toml`
+has no `draft_slot`; slot is a runtime flag (`fw-track --slot N`,
+`fw-sheet --slot N`) and snake pick math is derived from it plus `teams`.
+`board.csv` is slot-agnostic and gets built days early.
+
+The T-30 routine, in order:
+
+1. Learn the slot.
+2. `fw-sheet --slot N` — regenerates the printable page. Offline, sub-second.
+3. `fw-track --slot N` — tracker comes up knowing which picks are yours.
+
+As insurance, pre-render all `teams` slot variants of the sheet the night
+before, so on the night you are opening a file rather than running a command.
+
 ## The one rule
 
 **Nothing on the draft-night path touches the network.** `src/fw/track.py` must
@@ -25,12 +41,12 @@ Per evening: `/spec` → build → `/review` → `/qa` → `/ship`.
 
 | Path | What it is |
 |---|---|
-| `league.toml` | **The only config.** Scoring, roster, team count, draft slot. |
+| `league.toml` | **The only config.** Scoring, roster, team count. No draft slot — see above. |
 | `src/fw/scoring.py` | Stat line → fantasy points under our rules. Pure, no I/O. |
 | `src/fw/sources.py` | FFC ADP + Sleeper metadata + nflreadpy history → `data/raw/`. |
 | `src/fw/board.py` | ADP + history → projected points → VBD → tiers → `data/board.csv`. |
 | `src/fw/track.py` | Draft-night REPL. Stdlib only. |
-| `src/fw/sheet.py` | `board.csv` → one-page printable HTML. Last line of defence. |
+| `src/fw/sheet.py` | `board.csv` + `--slot` → one-page printable HTML. Last line of defence. |
 
 ## League specifics that break generic tools
 

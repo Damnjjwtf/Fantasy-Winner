@@ -1,13 +1,17 @@
 # The only config in this repo. Every VBD number downstream depends on it.
-# CONFIRM `teams` and `draft_slot` before Evening 4 — a wrong team count
-# silently corrupts the entire board.
+# CONFIRM `teams` before Evening 4 — a wrong team count silently corrupts
+# the entire board.
+#
+# There is deliberately NO draft_slot here. We only learn the order 30 minutes
+# before the draft, so slot is a RUNTIME argument (`fw-track --slot N`), never
+# build-time config. The board does not depend on it.
 
 [league]
 name       = "Fantasy Winner"
 yahoo_id   = 890969
 teams      = 12          # <-- CONFIRM
-draft_slot = 1           # <-- CONFIRM (1 = first overall)
 draft_type = "snake"
+third_round_reversal = false   # <-- CONFIRM; changes pick math if true
 
 [roster]
 # No kicker. Excluded from VBD baselines entirely.
