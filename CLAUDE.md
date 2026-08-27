@@ -14,9 +14,13 @@ has no `draft_slot`; slot is a runtime flag (`fw-track --slot N`,
 
 The T-30 routine, in order:
 
-1. Learn the slot.
-2. `fw-sheet --slot N` — regenerates the printable page. Offline, sub-second.
-3. `fw-track --slot N` — tracker comes up knowing which picks are yours.
+1. Learn the slot and the full order.
+2. Paste the 12 team names, in draft-position order, into `data/draft_order.txt`
+   — one per line. **Optional**: if the file is absent the tracker labels
+   opponents by seat number and everything else still works. Never let this
+   step block getting the tracker up.
+3. `fw-sheet --slot N` — regenerates the printable page. Offline, sub-second.
+4. `fw-track --slot N` — tracker comes up knowing which picks are yours.
 
 As insurance, pre-render all 12 slot variants of the sheet the night before, so
 on the night you are opening a file rather than running a command.
@@ -34,8 +38,13 @@ accumulates all 12 rosters and uses them to sharpen the cliff warning from
 and this tier has 2 left."*
 
 Opponent **needs** are computed from their roster so far. Opponent *tendencies*
-are not modelled — we have no history on these managers, and inventing a
-behavioural model from nothing would be worse than the positional-need read.
+are not modelled — this is a brand-new league with no completed season (every
+team 0-0-0, no Record Book history), so there is literally nothing to fit a
+behavioural model on. A made-up one would be worse than the positional-need read.
+
+Team names live in `league.toml` under `[teams]` purely so the tracker prints
+"Balls to the LaFleur needs RB" rather than "seat 8 needs RB" — faster to parse
+at 11pm on a 60-second clock. We are "Just Win Baby".
 
 ## The one rule
 

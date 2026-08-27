@@ -20,6 +20,26 @@ scoring_type = "head_to_head"
 fractional_points = true
 negative_points = true
 
+# The 12 managers, as listed in Yahoo standings. This is NOT draft order —
+# standings order is meaningless preseason and the real order arrives at T-30.
+# Used only so the tracker can label opponents by name instead of seat number.
+[teams]
+ours = "Just Win Baby"
+names = [
+  "Just Win Baby",
+  "Battle of Richmond",
+  "IGotFiiiiiiveonIT",
+  "Quest for S*x",
+  "Allocated 2 YOURMOMS",
+  "The PrAcTiCe sQuAd",
+  "Balls to the LaFleur",
+  "Pig's Pigs",
+  "Studs MacKenzie",
+  "H24-north-west-coastin-env-std",
+  "Vice Kings",
+  "The Foggy Bottom Boys",
+]
+
 [roster]
 # Yahoo: QB, WR, WR, RB, RB, TE, W/R/T, DEF, BN x5, IR
 # NO KICKER — confirmed. No K position, no K baseline in VBD.
