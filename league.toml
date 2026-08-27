@@ -135,4 +135,4 @@ adp_source      = "fantasyfootballcalculator"   # free, personal use, attributio
 adp_format      = "ppr"
 season          = 2026
 history_seasons = [2023, 2024, 2025]
-tier_gap_sd     = 0.75
+tier_gap_mult   = 2.0   # a gap is a cliff at 2x the local median gap

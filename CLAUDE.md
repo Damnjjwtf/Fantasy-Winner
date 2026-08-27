@@ -72,9 +72,9 @@ dates only, because the draft is at 11pm and off-by-one days matter.
 | Date | Day | Work |
 |---|---|---|
 | Aug 26 | Wed | ✅ scaffold, `league.toml` from real Yahoo settings. Install ponytail + gstack. |
-| Aug 27 | Thu | `scoring.py` + golden tests. Verify the 40-yd bonus question. |
-| Aug 28 | Fri | `sources.py` + committed fixtures. Runs on the local machine, not in a web container. |
-| Aug 29 | Sat | `board.py` — ADP→points fit, VBD, tiers. Review hard. |
+| Aug 27 | Thu | ✅ `scoring.py` + golden tests. 40-yd bonus resolved. |
+| Aug 28 | Fri | ✅ `sources.py`. ADP fetch must run locally; nflverse works anywhere. |
+| Aug 29 | Sat | ✅ `board.py` — positional-finish curve, VBD, recursive tiers. |
 | Aug 30 | Sun | `track.py` — the draft-night REPL. |
 | Aug 31 | Mon | `track.py` polish: team attribution, needs-aware cliff warnings. |
 | Sep 1  | Tue | `sheet.py`, pre-render all 12 slot variants, clean-clone reproducibility run. |
@@ -92,7 +92,7 @@ network-dependent step (the ADP refresh) happens that day, so keep the previous
 | `league.toml` | **The only config.** Scoring, roster, team count. No draft slot — see above. |
 | `src/fw/scoring.py` | Stat line → fantasy points under our rules. Pure, no I/O. |
 | `src/fw/sources.py` | FFC ADP + nflreadpy history/metadata → `data/raw/`. Only networked module. |
-| `src/fw/board.py` | ADP + history → projected points → VBD → tiers → `data/board.csv`. |
+| `src/fw/board.py` | ADP + history → projected points → VBD → tiers → `data/board.csv`. Slot-agnostic. |
 | `src/fw/track.py` | Draft-night REPL. Stdlib only. |
 | `src/fw/sheet.py` | `board.csv` + `--slot` → one-page printable HTML. Last line of defence. |
 
