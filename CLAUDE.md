@@ -75,7 +75,7 @@ dates only, because the draft is at 11pm and off-by-one days matter.
 | Aug 27 | Thu | ✅ `scoring.py` + golden tests. 40-yd bonus resolved. |
 | Aug 28 | Fri | ✅ `sources.py`. ADP fetch must run locally; nflverse works anywhere. |
 | Aug 29 | Sat | ✅ `board.py` — positional-finish curve, VBD, recursive tiers. |
-| Aug 30 | Sun | `track.py` — the draft-night REPL. |
+| Aug 30 | Sun | ✅ `track.py` — offline REPL, resumable, needs-aware cliffs. |
 | Aug 31 | Mon | `track.py` polish: team attribution, needs-aware cliff warnings. |
 | Sep 1  | Tue | `sheet.py`, pre-render all 12 slot variants, clean-clone reproducibility run. |
 | Sep 2  | Wed | Yahoo mock draft at a real 60s clock. Target: decide in under 30s. |
@@ -93,7 +93,7 @@ network-dependent step (the ADP refresh) happens that day, so keep the previous
 | `src/fw/scoring.py` | Stat line → fantasy points under our rules. Pure, no I/O. |
 | `src/fw/sources.py` | FFC ADP + nflreadpy history/metadata → `data/raw/`. Only networked module. |
 | `src/fw/board.py` | ADP + history → projected points → VBD → tiers → `data/board.csv`. Slot-agnostic. |
-| `src/fw/track.py` | Draft-night REPL. Stdlib only. |
+| `src/fw/track.py` | Draft-night REPL. Stdlib only, enforced by test. |
 | `src/fw/sheet.py` | `board.csv` + `--slot` → one-page printable HTML. Last line of defence. |
 
 ## League specifics that break generic tools
