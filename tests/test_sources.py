@@ -72,3 +72,27 @@ def test_malformed_payload_is_rejected(tmp_path):
     bad.write_text(json.dumps({"status": "Success", "players": []}))
     with pytest.raises(Exception):
         load_adp(bad).select("player").item()
+
+
+def test_normalize_name_bridges_punctuation_differences():
+    """FFC and nflverse punctuate differently; the join must survive it."""
+    from fw.sources import normalize_name
+    assert normalize_name("Ja'Marr Chase") == normalize_name("JaMarr Chase")
+    assert normalize_name("A.J. Brown") == normalize_name("AJ Brown")
+    assert normalize_name("Marvin Harrison Jr.") == normalize_name("Marvin Harrison")
+    assert normalize_name("Kenneth Walker III") == normalize_name("Kenneth Walker")
+
+
+def test_normalize_name_keeps_different_players_apart():
+    """Normalising must not collapse two real people into one."""
+    from fw.sources import normalize_name
+    assert normalize_name("Josh Allen") != normalize_name("Keenan Allen")
+    assert normalize_name("Michael Thomas") != normalize_name("Michael Pittman")
+
+
+def test_unavailable_covers_the_statuses_that_matter():
+    """A player on IR or PUP must never sit on the board looking healthy."""
+    from fw.sources import UNAVAILABLE
+    for code in ("RES", "PUP", "SUS"):
+        assert code in UNAVAILABLE
+    assert "ACT" not in UNAVAILABLE, "active players are not flagged"

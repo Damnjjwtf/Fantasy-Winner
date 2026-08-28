@@ -30,7 +30,7 @@ from pathlib import Path
 import polars as pl
 
 from fw.scoring import load_rules, points_allowed_points, score_dst, score_offense
-from fw.sources import load_adp, season_stats
+from fw.sources import UNAVAILABLE, load_adp, normalize_name, player_meta, season_stats
 
 OFFENSE = ("QB", "RB", "WR", "TE")
 BOARD = Path("data/board.csv")
@@ -236,6 +236,30 @@ def assign_tiers(board: pl.DataFrame, gap_mult: float, max_tier_size: int = 8) -
     return pl.concat(out).sort(["vbd"] + tb, descending=[True] + [False] * len(tb))
 
 
+def attach_status(board: pl.DataFrame) -> pl.DataFrame:
+    """Mark players whose roster status says they are not available to play.
+
+    A player on IR or PUP is otherwise indistinguishable from a healthy one on
+    this board — same ADP, same projection, same tier — which is exactly the
+    mistake worth spending a query to avoid. Left as a flag rather than a
+    filter: statuses change, and a player you know is coming back in week 3 may
+    still be worth a late pick. The board says what it knows; you decide.
+    """
+    meta = player_meta().select("join_key", "status").unique("join_key")
+    keyed = board.with_columns(
+        pl.col("player").map_elements(normalize_name, return_dtype=pl.String).alias("join_key")
+    )
+    return (
+        keyed.join(meta, on="join_key", how="left")
+        .with_columns(
+            pl.col("status")
+            .replace_strict(UNAVAILABLE, default=None)
+            .alias("unavailable")
+        )
+        .drop("join_key")
+    )
+
+
 def build(adp_path: str | Path, rules: dict) -> pl.DataFrame:
     seasons = rules["board"]["history_seasons"]
     curve = pl.concat([positional_curve(seasons, rules), dst_curve(seasons, rules)])
@@ -247,7 +271,8 @@ def build(adp_path: str | Path, rules: dict) -> pl.DataFrame:
          - pl.col("position").replace_strict(baselines, default=None)).alias("vbd")
     ).drop_nulls("vbd")
 
-    return assign_tiers(board.sort(_tiebreak(board)), rules["board"]["tier_gap_mult"]).with_columns(
+    tiered = assign_tiers(board.sort(_tiebreak(board)), rules["board"]["tier_gap_mult"])
+    return attach_status(tiered).with_columns(
         pl.col("proj_points").round(1), pl.col("vbd").round(1)
     ).with_row_index("overall_rank", offset=1)
 

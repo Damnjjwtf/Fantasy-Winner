@@ -70,6 +70,7 @@ def load_board(path: Path) -> list[dict]:
         r["vbd"] = float(r["vbd"])
         r["tier"] = int(r["tier"])
         r["adp"] = float(r["adp"])
+        r["unavailable"] = r.get("unavailable") or ""
     return rows
 
 
@@ -105,6 +106,10 @@ def _column(rows: list[dict], notes: dict[str, str], limit: int) -> str:
         note = notes.get(r["player"], "")
         cls = "avoid" if note.startswith("avoid") else "target" if note.startswith("target") else ""
         flag = f' <span class="{cls}">*</span>' if cls else ""
+        # Roster status comes from the board; a player on IR must not look healthy.
+        if r.get("unavailable"):
+            flag += ' <span class="avoid">&#9888;</span>'
+            cls = cls or "avoid"
         cells.append(
             f'<tr class="{"tierstart" if new_tier else ""}">'
             f'<td class="rk">{r["pos_rank"]}</td>'

@@ -45,6 +45,7 @@ def load_board(path: Path) -> list[dict]:
         r["proj_points"] = float(r["proj_points"])
         r["tier"] = int(r["tier"])
         r["adp"] = float(r["adp"])
+        r["unavailable"] = r.get("unavailable") or ""
     return rows
 
 
@@ -326,6 +327,8 @@ def render(d: Draft, per_pos: int = 6) -> str:
             note = d.notes.get(r["player"], "")
             flag = (f"{RED}!{RESET}" if note.startswith("avoid")
                     else f"{GREEN}+{RESET}" if note.startswith("target") else "")
+            if r.get("unavailable"):
+                flag += f"{RED}#{RESET}"
             cells.append(f"{sep}{marker} {r['player'][:17]}{flag} {DIM}{r['vbd']:.0f}{RESET}")
             last_tier = r["tier"]
         out.append(f"{BOLD}{pos:3}{RESET}" + "".join(cells))
@@ -392,6 +395,8 @@ def repl(d: Draft) -> None:
             hit = hits[0]
 
         owner = d.label(team_for_pick(d.on_the_clock, d.teams))
+        if hit.get("unavailable") and owner == "YOU":
+            print(f"{RED}WARNING: {hit['player']} is on {hit['unavailable']}{RESET}")
         note = d.notes.get(hit["player"])
         if note and owner == "YOU":
             # Surfaced at the moment of the pick, not buried in a list — this is

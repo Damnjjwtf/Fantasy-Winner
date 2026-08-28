@@ -143,14 +143,55 @@ def season_stats(seasons: list[int]) -> pl.DataFrame:
     )
 
 
+# Roster statuses that mean a player is not currently available to play.
+# nflverse `load_injuries` only covers in-season game-status reports (2009-2025),
+# so during draft week there is no structured feed for "who is hurt going into
+# drafts". Roster status is what exists, and it catches the severe end: a player
+# on IR or PUP must never sit on the board looking like a healthy pick.
+#
+# It does NOT catch the soft cases — "recovering, expected back week 4",
+# "limited in camp". Those still need a human reading the news, which is what
+# data/notes.toml is for.
+UNAVAILABLE = {
+    "RES": "injured reserve",
+    "PUP": "physically unable to perform",
+    "SUS": "suspended",
+    "NWT": "not with team",
+    "RET": "retired",
+    "RSN": "reserve (non-football)",
+    "RSR": "reserve (retired)",
+    "CUT": "not on a roster",
+}
+
+
+def normalize_name(name: str) -> str:
+    """Join key for ADP names against nflverse names.
+
+    FFC and nflverse punctuate differently (Ja'Marr vs JaMarr, A.J. vs AJ), and
+    suffixes drift, so both sides are reduced to letters only.
+    """
+    base = name.lower().replace(".", "").replace("'", "").replace("-", " ")
+    for suffix in (" jr", " sr", " ii", " iii", " iv", " v"):
+        if base.endswith(suffix):
+            base = base[: -len(suffix)]
+    return "".join(ch for ch in base if ch.isalnum())
+
+
 def player_meta() -> pl.DataFrame:
-    """Name/position/team/status, used to attach teams and byes to ADP rows."""
+    """Name/position/team/roster status, for attaching availability to the board."""
     import nflreadpy as nfl
 
-    return nfl.load_players().select(
+    df = nfl.load_players()
+    if "last_season" in df.columns:
+        # Decades of retired players share names with current ones; restricting
+        # to recent activity stops a 1990s namesake supplying a status.
+        df = df.filter(pl.col("last_season") >= 2025)
+    return df.select(
         pl.col("gsis_id").alias("player_id"),
         pl.col("display_name").alias("player"),
         pl.col("position"),
         pl.col("latest_team").alias("team"),
         pl.col("status"),
+    ).with_columns(
+        pl.col("player").map_elements(normalize_name, return_dtype=pl.String).alias("join_key")
     )
