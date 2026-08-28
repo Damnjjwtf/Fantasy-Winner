@@ -36,8 +36,18 @@ python -m fw.sheet --all                  # 12 slot variants, sub-second
 ```
 
 Print the ones for slots you might get, or all 12. **Paper is the last line of
-defence.** Optionally edit `data/notes.toml` (copy `notes.example.toml`) with any
-flags worth having in front of you.
+defence.**
+
+Optionally check the news for anyone on your board, then write the handful of
+conclusions that change a pick into `data/notes.toml` (copy `notes.example.toml`):
+
+```bash
+python -m fw.news --feed <your RSS url>      # prints a notes.toml skeleton
+```
+
+It finds the mentions; you decide what they mean. Roster status (IR, PUP,
+suspended) is already flagged automatically on the board — notes are for the
+soft cases a feed cannot give you structured.
 
 ---
 

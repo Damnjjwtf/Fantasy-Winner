@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Fantasy Wire</title>
+  <entry>
+    <title>Puka Nacua returns to full practice</title>
+    <summary>The Rams receiver was a full participant Thursday.</summary>
+    <link href="https://example.test/nacua"/>
+  </entry>
+</feed>

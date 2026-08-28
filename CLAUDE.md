@@ -96,6 +96,7 @@ network-dependent step (the ADP refresh) happens that day, so keep the previous
 | `src/fw/track.py` | Draft-night REPL. Stdlib only, enforced by test. |
 | `src/fw/sheet.py` | `board.csv` + `--slot` → one-page printable HTML. Last line of defence. |
 | `data/notes.toml` | Optional hand-written draft flags. Shown on sheet and in tracker. |
+| `src/fw/news.py` | Pre-draft only. RSS/Atom → which board players are in the news. |
 
 ## League specifics that break generic tools
 

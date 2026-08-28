@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Fantasy Football News</title>
+    <item>
+      <title>Ja'Marr Chase limited in practice Wednesday</title>
+      <description>The Bengals receiver was a limited participant with a hamstring issue.</description>
+      <link>https://example.test/chase</link>
+    </item>
+    <item>
+      <title>Bijan Robinson expected to see goal-line work</title>
+      <description>Atlanta's coach confirmed the back will handle short-yardage carries.</description>
+      <link>https://example.test/bijan</link>
+    </item>
+    <item>
+      <title>Week 1 weather roundup</title>
+      <description>Rain expected in three stadiums. No player names here.</description>
+      <link>https://example.test/weather</link>
+    </item>
+  </channel>
+</rss>
