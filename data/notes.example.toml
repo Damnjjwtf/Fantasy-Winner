@@ -1,0 +1,15 @@
+# Hand-maintained draft-night flags. Optional — the sheet and tracker work
+# without it. Copy to data/notes.toml and edit.
+#
+# You read the newsletters yourself and type only the conclusions that change a
+# pick. After filtering out what ADP and nflverse already tell us, a draft kit
+# yields a handful of actionable facts, not a dataset — so this is a dozen lines
+# by hand rather than a parser, and it carries no ToS exposure or network call.
+#
+# Keys are player names as they appear in board.csv. Prefix the value with
+# "avoid" or "target" to colour the flag; anything else prints as a plain note.
+
+[notes]
+# "Some Runningback" = "avoid: hamstring, limited in practice 9/2"
+# "Some Receiver"    = "target: WR1 role confirmed after trade"
+# "Some Tightend"    = "handcuff is already rostered"

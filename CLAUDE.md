@@ -76,8 +76,8 @@ dates only, because the draft is at 11pm and off-by-one days matter.
 | Aug 28 | Fri | ✅ `sources.py`. ADP fetch must run locally; nflverse works anywhere. |
 | Aug 29 | Sat | ✅ `board.py` — positional-finish curve, VBD, recursive tiers. |
 | Aug 30 | Sun | ✅ `track.py` — offline REPL, resumable, needs-aware cliffs. |
-| Aug 31 | Mon | `track.py` polish: team attribution, needs-aware cliff warnings. |
-| Sep 1  | Tue | `sheet.py`, pre-render all 12 slot variants, clean-clone reproducibility run. |
+| Aug 31 | Mon | ✅ `track.py` polish, hand-maintained `data/notes.toml` flags. |
+| Sep 1  | Tue | ✅ `sheet.py`, all 12 slot variants, reproducible build. |
 | Sep 2  | Wed | Yahoo mock draft at a real 60s clock. Target: decide in under 30s. |
 | Sep 3  | Thu | **Draft day.** Freeze code. Refresh ADP, regenerate board, print. T-30 routine at 10:30pm. **Draft 11:00pm.** |
 
@@ -95,6 +95,7 @@ network-dependent step (the ADP refresh) happens that day, so keep the previous
 | `src/fw/board.py` | ADP + history → projected points → VBD → tiers → `data/board.csv`. Slot-agnostic. |
 | `src/fw/track.py` | Draft-night REPL. Stdlib only, enforced by test. |
 | `src/fw/sheet.py` | `board.csv` + `--slot` → one-page printable HTML. Last line of defence. |
+| `data/notes.toml` | Optional hand-written draft flags. Shown on sheet and in tracker. |
 
 ## League specifics that break generic tools
 

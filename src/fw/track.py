@@ -28,6 +28,7 @@ from pathlib import Path
 BOARD = Path("data/board.csv")
 STATE = Path("data/draft_state.json")
 ORDER = Path("data/draft_order.txt")
+NOTES = Path("data/notes.toml")
 
 # ANSI, used sparingly: at 11pm the eye should land on the cliff warning first.
 BOLD, DIM, RED, YELLOW, GREEN, RESET = (
@@ -45,6 +46,17 @@ def load_board(path: Path) -> list[dict]:
         r["tier"] = int(r["tier"])
         r["adp"] = float(r["adp"])
     return rows
+
+
+def load_notes(path: Path = NOTES) -> dict[str, str]:
+    """Hand-maintained flags, if present. Duplicated from sheet.py on purpose:
+    track.py imports nothing from this package so that its offline guarantee is
+    self-contained and mechanically checkable. Three lines is cheaper than that.
+    """
+    if not path.exists():
+        return {}
+    with open(path, "rb") as fh:
+        return tomllib.load(fh).get("notes", {})
 
 
 def team_for_pick(pick: int, teams: int) -> int:
@@ -68,7 +80,8 @@ def next_pick_for(slot: int, teams: int, rounds: int, after: int) -> int | None:
 class Draft:
     """All draft state. Rebuilt from the pick list, so undo is just a pop."""
 
-    def __init__(self, board: list[dict], rules: dict, slot: int, names: list[str]):
+    def __init__(self, board: list[dict], rules: dict, slot: int, names: list[str],
+                 notes: dict[str, str] | None = None):
         self.board = board
         self.rules = rules
         self.slot = slot
@@ -79,6 +92,7 @@ class Draft:
         self.flex_eligible = rules["roster"]["flex_eligible"]
         self.names = names
         self.picks: list[str] = []
+        self.notes = notes or {}
         self.by_key = {r["player"].lower(): r for r in board}
 
     # ---- state -----------------------------------------------------------
@@ -309,7 +323,10 @@ def render(d: Draft, per_pos: int = 6) -> str:
         for r in pool:
             sep = " | " if last_tier is not None and r["tier"] != last_tier else "  "
             marker = f"{YELLOW}T{r['tier']}{RESET}"
-            cells.append(f"{sep}{marker} {r['player'][:17]} {DIM}{r['vbd']:.0f}{RESET}")
+            note = d.notes.get(r["player"], "")
+            flag = (f"{RED}!{RESET}" if note.startswith("avoid")
+                    else f"{GREEN}+{RESET}" if note.startswith("target") else "")
+            cells.append(f"{sep}{marker} {r['player'][:17]}{flag} {DIM}{r['vbd']:.0f}{RESET}")
             last_tier = r["tier"]
         out.append(f"{BOLD}{pos:3}{RESET}" + "".join(cells))
     out.append("-" * 78)
@@ -375,6 +392,11 @@ def repl(d: Draft) -> None:
             hit = hits[0]
 
         owner = d.label(team_for_pick(d.on_the_clock, d.teams))
+        note = d.notes.get(hit["player"])
+        if note and owner == "YOU":
+            # Surfaced at the moment of the pick, not buried in a list — this is
+            # the only point at which a flag can still change the decision.
+            print(f"{YELLOW}note: {hit['player']} — {note}{RESET}")
         d.mark(hit["player"])
         print(f"{GREEN}{hit['player']} -> {owner}{RESET}")
         print(render(d))
@@ -409,7 +431,7 @@ def main() -> None:
     if args.reset and STATE.exists():
         STATE.unlink()
 
-    d = Draft(load_board(args.board), rules, args.slot, names)
+    d = Draft(load_board(args.board), rules, args.slot, names, load_notes())
     d.load()
     if d.picks:
         print(f"{YELLOW}resumed at pick {d.on_the_clock} ({len(d.picks)} already marked){RESET}")
