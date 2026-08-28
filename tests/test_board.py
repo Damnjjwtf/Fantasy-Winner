@@ -113,3 +113,32 @@ def test_project_drops_players_beyond_the_curve():
     })
     curve = pl.DataFrame({"position": ["WR"], "pos_rank": [1], "proj_points": [300.0]})
     assert project(adp, curve).height == 1
+
+
+def test_tier_assignment_is_deterministic():
+    """Identical inputs must give identical output, ties included.
+
+    Replacement-level players sit at exactly vbd 0.0 and polars sorts are not
+    stable by default, so ties were once broken arbitrarily — the same inputs
+    produced boards differing by a few rows between runs. Quiet, but it meant
+    the board rebuilt on draft day need not match the sheet already printed.
+    """
+    b = pl.DataFrame({
+        "player": [f"p{i}" for i in range(12)],
+        "position": ["RB"] * 12,
+        "adp": [float(i) for i in range(12)],
+        "vbd": [100.0, 50.0, 0.0, 0.0, 0.0, 0.0, -10.0, -20.0, -20.0, -30.0, -40.0, -50.0],
+    })
+    runs = [assign_tiers(b, gap_mult=2.0).to_dicts() for _ in range(5)]
+    assert all(r == runs[0] for r in runs)
+
+
+def test_tied_players_keep_a_stable_order():
+    """Ties break by ADP then name, so the order is a property of the data."""
+    b = pl.DataFrame({
+        "player": ["zeta", "alpha", "mid"],
+        "position": ["WR"] * 3,
+        "adp": [3.0, 1.0, 2.0],
+        "vbd": [0.0, 0.0, 0.0],
+    })
+    assert assign_tiers(b, gap_mult=2.0)["player"].to_list() == ["alpha", "mid", "zeta"]

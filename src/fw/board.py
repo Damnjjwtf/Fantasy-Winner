@@ -40,8 +40,14 @@ BOARD = Path("data/board.csv")
 # vbd 0.0, so ties were being broken arbitrarily: the same inputs produced
 # boards that differed by a few rows between runs. Harmless-looking, but it
 # means the board you rebuild on draft day need not match the sheet you printed
-# and rehearsed with. ADP then player name gives a total order.
-_TIEBREAK = ["adp", "player"]
+# and rehearsed with.
+#
+# Player name alone already gives a total order; ADP is preferred ahead of it
+# where available so ties fall in market order rather than alphabetically. The
+# helper adapts rather than demanding an `adp` column from functions that have
+# no other use for one.
+def _tiebreak(df: pl.DataFrame) -> list[str]:
+    return [c for c in ("adp", "player") if c in df.columns]
 
 
 def positional_curve(seasons: list[int], rules: dict) -> pl.DataFrame:
@@ -127,7 +133,7 @@ def dst_curve(seasons: list[int], rules: dict) -> pl.DataFrame:
 
 def project(adp: pl.DataFrame, curve: pl.DataFrame) -> pl.DataFrame:
     """Attach a projection to each ADP row via its rank within position."""
-    ranked = adp.sort(_TIEBREAK).with_columns(
+    ranked = adp.sort(_tiebreak(adp)).with_columns(
         pl.col("adp").rank("ordinal").over("position").alias("pos_rank")
     )
     return ranked.join(curve, on=["position", "pos_rank"], how="left").drop_nulls("proj_points")
@@ -149,11 +155,12 @@ def replacement_baselines(proj: pl.DataFrame, rules: dict) -> dict[str, float]:
 
     pool = (
         proj.filter(pl.col("position").is_in(flex_eligible))
-        .sort(_TIEBREAK)
+        .sort(_tiebreak(proj))
         .with_columns(pl.col("proj_points").rank("ordinal", descending=True)
                       .over("position").alias("within"))
         .filter(pl.col("within") > pl.col("position").replace_strict(dedicated, default=0))
-        .sort(["proj_points"] + _TIEBREAK, descending=[True, False, False])
+        .sort(["proj_points"] + _tiebreak(proj),
+              descending=[True] + [False] * len(_tiebreak(proj)))
         .head(starters.get("FLEX", 0) * teams)
     )
     for pos, n in pool["position"].value_counts().rows():
@@ -162,7 +169,8 @@ def replacement_baselines(proj: pl.DataFrame, rules: dict) -> dict[str, float]:
     baselines = {}
     for pos, n in dedicated.items():
         at_pos = proj.filter(pl.col("position") == pos).sort(
-            ["proj_points"] + _TIEBREAK, descending=[True, False, False])
+            ["proj_points"] + _tiebreak(proj),
+            descending=[True] + [False] * len(_tiebreak(proj)))
         if at_pos.height == 0 or n == 0:
             continue
         baselines[pos] = float(at_pos["proj_points"][min(n, at_pos.height) - 1])
@@ -196,8 +204,9 @@ def assign_tiers(board: pl.DataFrame, gap_mult: float, max_tier_size: int = 8) -
     """
     out = []
     for pos in sorted(board["position"].unique().to_list()):
+        tb = _tiebreak(board)
         grp = board.filter(pl.col("position") == pos).sort(
-            ["vbd"] + _TIEBREAK, descending=[True, False, False])
+            ["vbd"] + tb, descending=[True] + [False] * len(tb))
         vals = grp["vbd"].to_list()
         n = len(vals)
         gaps = [vals[i] - vals[i + 1] for i in range(n - 1)]
@@ -223,7 +232,8 @@ def assign_tiers(board: pl.DataFrame, gap_mult: float, max_tier_size: int = 8) -
                 tier += 1
             tiers.append(tier)
         out.append(grp.with_columns(pl.Series("tier", tiers)))
-    return pl.concat(out).sort(["vbd"] + _TIEBREAK, descending=[True, False, False])
+    tb = _tiebreak(board)
+    return pl.concat(out).sort(["vbd"] + tb, descending=[True] + [False] * len(tb))
 
 
 def build(adp_path: str | Path, rules: dict) -> pl.DataFrame:
@@ -237,7 +247,7 @@ def build(adp_path: str | Path, rules: dict) -> pl.DataFrame:
          - pl.col("position").replace_strict(baselines, default=None)).alias("vbd")
     ).drop_nulls("vbd")
 
-    return assign_tiers(board.sort(_TIEBREAK), rules["board"]["tier_gap_mult"]).with_columns(
+    return assign_tiers(board.sort(_tiebreak(board)), rules["board"]["tier_gap_mult"]).with_columns(
         pl.col("proj_points").round(1), pl.col("vbd").round(1)
     ).with_row_index("overall_rank", offset=1)
 
